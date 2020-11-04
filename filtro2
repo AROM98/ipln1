@@ -8,28 +8,12 @@ import sys
 from getopt import getopt
 from re import *
 from pickle import *
-from spacy 
+import spacy 
 
-BG = {}
 
-def gTree(n):
-    nome = BG[n]['name']
-    print(nome)
-    for i in BG[n]['fams']:
-        for f in BF[i]['child']:
-            filho = BG[f]['name']
-            print('\t',filho)
-
-def procIndi(s, i):
-    indi = {}
-    v = search(r'\bNAME\s+(.*)', i)
-    if v:
-        indi['name'] = v[1]
-    v = findall(r'\bFAMS\s+@(.*)@', i)
-    indi['fams'] = v
-    BG[s] = indi
 
 BF = {}
+# vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
 def procFam(f, i):
     fam = {}
     g = search(r'\bHUSB\s+@(.*)@', i)
@@ -42,12 +26,10 @@ def procFam(f, i):
     fam['child'] = c
     BF[f] = fam
 
+# vai divir livro por capitulos e usar a funçao interact em cada um.
 def procTexto(t):
     items = split(r'\n0', t)
     for i in items:
-        z = search(r'@(I\d+)@ *INDI', i)
-        if z:
-            procIndi(z.group(1),i)
         f = search(r'@(F\d+)@ *FAM', i)
         if f:
             procFam(f.group(1),i)
@@ -60,12 +42,13 @@ for ficheiro in args:
     #processar o texto
     procTexto(txt)
 
-print(BG)
+
 print(BF)
-Pickler.dump()
+#  rever isto do pickle ---- Pickler.dump()
 
 #diferentes opçoes
 if '-a' in ops:
-    gTree(ops["-a"])
+    pass
+    #gTree(ops["-a"])
 
 
