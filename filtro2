@@ -12,27 +12,19 @@ import spacy
 
 
 
-BF = {}
+
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
 def procFam(f, i):
-    fam = {}
-    g = search(r'\bHUSB\s+@(.*)@', i)
-    if g:
-        fam['husb'] = g.group(1)
-    w = search(r'\bWIFE\s+@(.*)@', i)
-    if w:
-        fam['wife'] = w.group(1)
-    c = findall(r'\bCHIL\s+@(.*)@', i)
-    fam['child'] = c
-    BF[f] = fam
+    pass
 
 # vai divir livro por capitulos e usar a funçao interact em cada um.
 def procTexto(t):
-    items = split(r'\n0', t)
-    for i in items:
-        f = search(r'@(F\d+)@ *FAM', i)
-        if f:
-            procFam(f.group(1),i)
+    text2 = sub(r'\f', '', txt)
+    text3 = sub(r'\n\n+', '\n', text2)
+    text4 = sub(r'(\n[A-z])\n', r'\n\1', text3)
+    # apartir daqui o texto parece estar mais ou menos organizado para fazer o resto.
+    print(text4)
+    #items = split(r'\n0', t)
 
 ops,args = getopt(sys.argv[1:],"a:o:")
 ops = dict(ops)
@@ -43,7 +35,6 @@ for ficheiro in args:
     procTexto(txt)
 
 
-print(BF)
 #  rever isto do pickle ---- Pickler.dump()
 
 #diferentes opçoes
