@@ -1,0 +1,71 @@
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+"""
+filtro para leitura de varios ficheiro passados em linha de comando
+
+...
+"""
+import sys
+from getopt import getopt
+from re import *
+from pickle import *
+from spacy 
+
+BG = {}
+
+def gTree(n):
+    nome = BG[n]['name']
+    print(nome)
+    for i in BG[n]['fams']:
+        for f in BF[i]['child']:
+            filho = BG[f]['name']
+            print('\t',filho)
+
+def procIndi(s, i):
+    indi = {}
+    v = search(r'\bNAME\s+(.*)', i)
+    if v:
+        indi['name'] = v[1]
+    v = findall(r'\bFAMS\s+@(.*)@', i)
+    indi['fams'] = v
+    BG[s] = indi
+
+BF = {}
+def procFam(f, i):
+    fam = {}
+    g = search(r'\bHUSB\s+@(.*)@', i)
+    if g:
+        fam['husb'] = g.group(1)
+    w = search(r'\bWIFE\s+@(.*)@', i)
+    if w:
+        fam['wife'] = w.group(1)
+    c = findall(r'\bCHIL\s+@(.*)@', i)
+    fam['child'] = c
+    BF[f] = fam
+
+def procTexto(t):
+    items = split(r'\n0', t)
+    for i in items:
+        z = search(r'@(I\d+)@ *INDI', i)
+        if z:
+            procIndi(z.group(1),i)
+        f = search(r'@(F\d+)@ *FAM', i)
+        if f:
+            procFam(f.group(1),i)
+
+ops,args = getopt(sys.argv[1:],"a:o:")
+ops = dict(ops)
+for ficheiro in args:
+    with open(ficheiro) as f :
+        txt = f.read()
+    #processar o texto
+    procTexto(txt)
+
+print(BG)
+print(BF)
+Pickler.dump()
+
+#diferentes opçoes
+if '-a' in ops:
+    gTree(ops["-a"])
+
+
