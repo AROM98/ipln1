@@ -29,12 +29,11 @@ def procTexto(t):
     capitulos = findall(r'(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*|\n)(?=CHAPTER\ \w+|Text\ copyright)', text4)
      #    (CHAPTER\ \w+)\n([\w\ ]+)\n\n(.+)      ---  (CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)(.*+)(CHAPTER\ \w+|Text copyright)
     # , titulo, texto
-    for cap, titulo, texto, lixo in capitulos:
+    for cap, titulo, texto in capitulos:
         print('.....................................\n') 
         print(cap+'\n')
         print(titulo+'\n\n')
         print(texto+'\n')
-        print(lixo+'\n')
         print('.....................................\n') 
 
     #items = split(r'\n0', t)
