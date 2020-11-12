@@ -7,6 +7,7 @@ filtro para leitura de varios ficheiro passados em linha de comando
 import sys
 from getopt import getopt
 from re import *
+import re
 from pickle import *
 import spacy 
 
@@ -19,24 +20,24 @@ def procFam(f, i):
 
 
 
-# vai divir livro por capitulos e usar a funçao interact em cada um.
+# vai dividir livro por capitulos e usar a funçao interact em cada um.
 def procTexto(t):
     text2 = sub(r'\f', '', txt)
     text3 = sub(r'\n\n+', '\n', text2)
     text4 = sub(r'(\n[A-Z])\n', r'\n\1', text3)
     # texto limpo
+    regex = r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)"
+    #capitulos = findall(r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)", text4)
+    matches = re.finditer(regex, text4, re.DOTALL)
 
-    capitulos = findall(r'(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*|\n)(?=CHAPTER\ \w+|Text\ copyright)', text4)
-     #    (CHAPTER\ \w+)\n([\w\ ]+)\n\n(.+)      ---  (CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)(.*+)(CHAPTER\ \w+|Text copyright)
-    # , titulo, texto
-    for cap, titulo, texto in capitulos:
+    for matchNum, match in enumerate(matches, start=1):
+    
         print('.....................................\n') 
-        print(cap+'\n')
-        print(titulo+'\n\n')
-        print(texto+'\n')
-        print('.....................................\n') 
+        print(match.group(1)+'\n') # nº do capitulo
+        print(match.group(2)+'\n') # nome do capitulo
+        print(match.group(3)+'\n') # texto do capitulo
+        print('.....................................\n')   
 
-    #items = split(r'\n0', t)
 
 ops,args = getopt(sys.argv[1:],"a:o:")
 ops = dict(ops)
