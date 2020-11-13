@@ -1,4 +1,4 @@
-#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+#!/usr/bin/python3
 """
 filtro para leitura de varios ficheiro passados em linha de comando
 
@@ -9,9 +9,9 @@ from getopt import getopt
 from re import *
 import re
 from pickle import *
-import spacy 
+import spacy
 
-
+n = spacy.load("en_core_web_sm")
 
 
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
@@ -31,12 +31,20 @@ def procTexto(t):
     matches = re.finditer(regex, text4, re.DOTALL)
 
     for matchNum, match in enumerate(matches, start=1):
-    
-        print('.....................................\n') 
+
+        print('.....................................\n')
         print(match.group(1)+'\n') # nº do capitulo
         print(match.group(2)+'\n') # nome do capitulo
         print(match.group(3)+'\n') # texto do capitulo
-        print('.....................................\n')   
+        print('.....................................\n')
+
+        text = n(match.group(3))
+        text.vocab.vectors
+        j = 0
+        for j in range(0,len(list(text.sents))):
+            for t in list(text.sents)[j]:
+                if(t.pos_ == 'PROPN'):
+                    print (t.text)
 
 
 ops,args = getopt(sys.argv[1:],"a:o:")
@@ -54,5 +62,3 @@ for ficheiro in args:
 if '-a' in ops:
     pass
     #gTree(ops["-a"])
-
-
