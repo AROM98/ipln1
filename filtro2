@@ -1,7 +1,8 @@
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 #!/usr/bin/python3
 """
 filtro para leitura de varios ficheiro passados em linha de comando
-
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 ...
 """
 import sys
@@ -14,14 +15,32 @@ import spacy
 n = spacy.load("en_core_web_sm")
 
 
+def flatten(input_list):
+    '''
+    A function to flatten complex list.
+    :param input_list: The list to be flatten
+    :return: the flattened list.
+    '''
+
+    flat_list = []
+    for i in input_list:
+        if type(i) == list:
+            flat_list += flatten(i)
+        else:
+            flat_list += [i]
+
+    return flat_list
+
+
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
-def procFam(f, i):
+def interact(f, i):
     pass
 
 
-
+entidades = {}
+dic2 = {('harry','voldemort'):1, ('coisa1','coisa2'):1,}
 # vai dividir livro por capitulos e usar a funçao interact em cada um.
-def procTexto(t):
+def procTexto(t, words):
     text2 = sub(r'\f', '', txt)
     text3 = sub(r'\n\n+', '\n', text2)
     text4 = sub(r'(\n[A-Z])\n', r'\n\1', text3)
@@ -40,12 +59,36 @@ def procTexto(t):
 
         text = n(match.group(3))
         text.vocab.vectors
+        frase = list(text.sents)[0]
+        # retrieve person and organization's name from the sentence
+        name_entity = [x for x in frase.ents if x.label_ in ['PERSON', 'ORG']]
+         # convert all names to lowercase and remove 's in names
+        name_entity = [str(x).lower().replace("'s","") for x in name_entity]
+        # split names into single words ('Harry Potter' -> ['Harry', 'Potter'])
+        name_entity = [x.split(' ') for x in name_entity]
+        # flatten the name list
+        name_entity = flatten(name_entity)
+        # remove name words that are less than 3 letters to raise recognition accuracy
+        name_entity = [x for x in name_entity if len(x) >= 3]
+        # remove name words that are in the set of 4000 common words
+        name_entity = [x for x in name_entity if x not in words]
+        print("name_entity = ",name_entity)
+        if ent in dic2 for ent in name_entity:
+            entidades[name_entity] += 1
+        else:
+            entidades[name_entity] = 1
+        '''
         j = 0
         for j in range(0,len(list(text.sents))):
             for t in list(text.sents)[j]:
                 if(t.pos_ == 'PROPN'):
+                    if t.text in entidades:
+                        entidades[t.text] += 1
+                    else:
+                        entidades[t.text] = 1
                     print (t.text)
-
+        '''
+        print(name_entity)
 
 ops,args = getopt(sys.argv[1:],"a:o:")
 ops = dict(ops)
@@ -53,10 +96,11 @@ for ficheiro in args:
     with open(ficheiro) as f :
         txt = f.read()
     #processar o texto
-    procTexto(txt)
+    procTexto(txt[0], txt[1])
+    print('.....................................\n')
+    print('.....................................\n')
+    print(entidades)
 
-
-#  rever isto do pickle ---- Pickler.dump()
 
 #diferentes opçoes
 if '-a' in ops:
