@@ -11,8 +11,33 @@ from re import *
 import re
 from pickle import *
 import spacy
+import functools
 
 n = spacy.load("en_core_web_sm")
+
+def concat_key(ls):
+    my_elems = sorted(set(ls))
+    #print("lista = ",my_elems)
+    return functools.reduce(lambda a,b: a + " " + b, my_elems)
+
+def add_encounter(cap_encounters, ls):
+    key_enc = concat_key(ls) # key (string) que representa as entidades
+    num_enc = cap_encounters.get(key_enc, 0) + 1 # procura no dic do capito se encontra a key, se nao da 0
+    cap_encounters[key_enc] = num_enc # add no dic do cap. 
+
+def get_capitulo(god_dict, num_cap, lista_de_ents):
+    init_dict = {}
+    for ents in lista_de_ents:
+        add_encounter(init_dict, ents)
+    god_dict[num_cap] = init_dict
+
+def pretty_print_caps(god_dict):
+    
+    for cap_num, cap_dict in god_dict.items():
+        print('FOR CHAPTER #' + str(cap_num))
+        tmp = sorted(god_dict[cap_num].items(), key=lambda x: x[1]) # ordena por nº de interaçoes
+        for ents, ents_encounters in tmp:
+            print('\t(' + ents + ') -> ' + str(ents_encounters))
 
 
 def flatten(input_list):
@@ -28,7 +53,6 @@ def flatten(input_list):
             flat_list += flatten(i)
         else:
             flat_list += [i]
-
     return flat_list
 
 
@@ -37,10 +61,11 @@ def interact(f, i):
     pass
 
 
-entidades = {}
+god_dict = {}
 #dic2 = {('harry','voldemort'):1, ('coisa1','coisa2'):1,}
 # vai dividir livro por capitulos e usar a funçao interact em cada um.
 def procTexto(t, words):
+    num_cap = 0
     text2 = sub(r'\f', '', txt)
     text3 = sub(r'\n\n+', '\n', text2)
     text4 = sub(r'(\n[A-Z])\n', r'\n\1', text3)
@@ -51,18 +76,20 @@ def procTexto(t, words):
 
     for matchNum, match in enumerate(matches, start=1):
 
-        print('.....................................\n')
-        print(match.group(1)+'\n') # nº do capitulo
+        #print('.....................................\n')
+        #print(match.group(1)+'\n') # nº do capitulo
         #print(match.group(2)+'\n') # nome do capitulo
         #print(match.group(3)+'\n') # texto do capitulo
-        print('.....................................\n')
+        #print('.....................................\n')
 
         text = n(match.group(3))
         text.vocab.vectors
-        
         frases = list(text.sents)
-
+        frases_cap = []
+        cap_ent = []
+        num_cap += 1
         for j in range(0,len(frases)):
+            
                 #  AS SEGUINTES LINHAS ABAIXO SAO COPIDAS DO GITHUB
 
                 # retrieve person and organization's name from the sentence
@@ -77,26 +104,16 @@ def procTexto(t, words):
             name_entity = [x for x in name_entity if len(x) >= 3]
                 # remove name words that are in the set of 4000 common words
             name_entity = [x for x in name_entity if x not in words]
-                # -------------------------------------------------------------
-            '''
-                print("name_entity = ",name_entity)
-                if ent in dic2 for ent in name_entity:
-                    entidades[name_entity] += 1
-                else:
-                    entidades[name_entity] = 1
-            '''
-            '''
-                j = 0
-                for j in range(0,len(list(text.sents))):
-                    for t in list(text.sents)[j]:
-                        if(t.pos_ == 'PROPN'):
-                            if t.text in entidades:
-                                entidades[t.text] += 1
-                            else:
-                                entidades[t.text] = 1
-                            print (t.text)
-            '''
-            print(name_entity)
+            if name_entity: # se a lista nao for vazia adiciona
+                cap_ent.append(name_entity)
+        #print(cap_ent)
+            #name_entity = sorted(set(name_entity))
+            
+            # -------------------------------------------------------------
+        get_capitulo(god_dict, num_cap, cap_ent)
+            # dentro do dic_god[capitulo] adicionar dic de dic interaçoes
+    pretty_print_caps(god_dict)
+
 
 ops,args = getopt(sys.argv[1:],"a:o:")
 ops = dict(ops)
