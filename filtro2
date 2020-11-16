@@ -75,7 +75,7 @@ def procTexto(t, words):
     matches = re.finditer(regex, text4, re.DOTALL)
 
     for matchNum, match in enumerate(matches, start=1):
-
+        print('.\n')
         #print('.....................................\n')
         #print(match.group(1)+'\n') # nº do capitulo
         #print(match.group(2)+'\n') # nome do capitulo
