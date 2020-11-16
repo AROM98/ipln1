@@ -38,7 +38,7 @@ def interact(f, i):
 
 
 entidades = {}
-dic2 = {('harry','voldemort'):1, ('coisa1','coisa2'):1,}
+#dic2 = {('harry','voldemort'):1, ('coisa1','coisa2'):1,}
 # vai dividir livro por capitulos e usar a funçao interact em cada um.
 def procTexto(t, words):
     text2 = sub(r'\f', '', txt)
@@ -53,42 +53,50 @@ def procTexto(t, words):
 
         print('.....................................\n')
         print(match.group(1)+'\n') # nº do capitulo
-        print(match.group(2)+'\n') # nome do capitulo
-        print(match.group(3)+'\n') # texto do capitulo
+        #print(match.group(2)+'\n') # nome do capitulo
+        #print(match.group(3)+'\n') # texto do capitulo
         print('.....................................\n')
 
         text = n(match.group(3))
         text.vocab.vectors
-        frase = list(text.sents)[0]
-        # retrieve person and organization's name from the sentence
-        name_entity = [x for x in frase.ents if x.label_ in ['PERSON', 'ORG']]
-         # convert all names to lowercase and remove 's in names
-        name_entity = [str(x).lower().replace("'s","") for x in name_entity]
-        # split names into single words ('Harry Potter' -> ['Harry', 'Potter'])
-        name_entity = [x.split(' ') for x in name_entity]
-        # flatten the name list
-        name_entity = flatten(name_entity)
-        # remove name words that are less than 3 letters to raise recognition accuracy
-        name_entity = [x for x in name_entity if len(x) >= 3]
-        # remove name words that are in the set of 4000 common words
-        name_entity = [x for x in name_entity if x not in words]
-        print("name_entity = ",name_entity)
-        if ent in dic2 for ent in name_entity:
-            entidades[name_entity] += 1
-        else:
-            entidades[name_entity] = 1
-        '''
-        j = 0
-        for j in range(0,len(list(text.sents))):
-            for t in list(text.sents)[j]:
-                if(t.pos_ == 'PROPN'):
-                    if t.text in entidades:
-                        entidades[t.text] += 1
-                    else:
-                        entidades[t.text] = 1
-                    print (t.text)
-        '''
-        print(name_entity)
+        
+        frases = list(text.sents)
+
+        for j in range(0,len(frases)):
+                #  AS SEGUINTES LINHAS ABAIXO SAO COPIDAS DO GITHUB
+
+                # retrieve person and organization's name from the sentence
+            name_entity = [x for x in frases[j].ents if x.label_ in ['PERSON', 'ORG']]
+            # convert all names to lowercase and remove 's in names
+            name_entity = [str(x).lower().replace("'s","") for x in name_entity]
+            # split names into single words ('Harry Potter' -> ['Harry', 'Potter'])
+            name_entity = [x.split(' ') for x in name_entity]
+            # flatten the name list
+            name_entity = flatten(name_entity)
+            # remove name words that are less than 3 letters to raise recognition accuracy
+            name_entity = [x for x in name_entity if len(x) >= 3]
+                # remove name words that are in the set of 4000 common words
+            name_entity = [x for x in name_entity if x not in words]
+                # -------------------------------------------------------------
+            '''
+                print("name_entity = ",name_entity)
+                if ent in dic2 for ent in name_entity:
+                    entidades[name_entity] += 1
+                else:
+                    entidades[name_entity] = 1
+            '''
+            '''
+                j = 0
+                for j in range(0,len(list(text.sents))):
+                    for t in list(text.sents)[j]:
+                        if(t.pos_ == 'PROPN'):
+                            if t.text in entidades:
+                                entidades[t.text] += 1
+                            else:
+                                entidades[t.text] = 1
+                            print (t.text)
+            '''
+            print(name_entity)
 
 ops,args = getopt(sys.argv[1:],"a:o:")
 ops = dict(ops)
@@ -96,10 +104,8 @@ for ficheiro in args:
     with open(ficheiro) as f :
         txt = f.read()
     #processar o texto
+    #load de palavras commum
     procTexto(txt[0], txt[1])
-    print('.....................................\n')
-    print('.....................................\n')
-    print(entidades)
 
 
 #diferentes opçoes
