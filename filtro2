@@ -1,5 +1,5 @@
-#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 #!/usr/bin/python3
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 """
 filtro para leitura de varios ficheiro passados em linha de comando
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
@@ -23,7 +23,7 @@ def concat_key(ls):
 def add_encounter(cap_encounters, ls):
     key_enc = concat_key(ls) # key (string) que representa as entidades
     num_enc = cap_encounters.get(key_enc, 0) + 1 # procura no dic do capito se encontra a key, se nao da 0
-    cap_encounters[key_enc] = num_enc # add no dic do cap. 
+    cap_encounters[key_enc] = num_enc # add no dic do cap.
 
 def get_capitulo(god_dict, num_cap, lista_de_ents):
     init_dict = {}
@@ -59,7 +59,7 @@ def flatten(input_list):
 def interact(frase):
     name_entity = [x for x in frase.ents if x.label_ in ['PERSON']]
     #print('b:',name_entity)
-    
+
     #print('a:',name_entity)
     # convert all names to lowercase and remove 's in names
     name_entity = [str(x).replace("'s","") for x in name_entity]
