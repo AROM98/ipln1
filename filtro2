@@ -31,8 +31,8 @@ def get_capitulo(god_dict, num_cap, lista_de_ents):
         add_encounter(init_dict, ents)
     god_dict[num_cap] = init_dict
 
+
 def pretty_print_caps(god_dict):
-    
     for cap_num, cap_dict in god_dict.items():
         print('FOR CHAPTER #' + str(cap_num))
         tmp = sorted(god_dict[cap_num].items(), key=lambda x: x[1]) # ordena por nº de interaçoes
@@ -56,25 +56,29 @@ def flatten(input_list):
 
 
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
-def interact(frase, words):
-    name_entity = [x for x in frase.ents if x.label_ in ['PERSON', 'ORG']]
+def interact(frase):
+    name_entity = [x for x in frase.ents if x.label_ in ['PERSON']]
+    #print('b:',name_entity)
+    
+    #print('a:',name_entity)
     # convert all names to lowercase and remove 's in names
-    name_entity = [str(x).lower().replace("'s","") for x in name_entity]
+    name_entity = [str(x).replace("'s","") for x in name_entity]
+
+    name_entity = [str(x) for x in name_entity if x[0].isupper()]
+    print(name_entity)
     # split names into single words ('Harry Potter' -> ['Harry', 'Potter'])
-    name_entity = [x.split(' ') for x in name_entity]
+    name_entity = [x.replace(' ','_') for x in name_entity]
     # flatten the name list
     name_entity = flatten(name_entity)
     # remove name words that are less than 3 letters to raise recognition accuracy
     name_entity = [x for x in name_entity if len(x) >= 3]
-    # remove name words that are in the set of 4000 common words
-    name_entity = [x for x in name_entity if x not in words]
     return name_entity
 
 
 god_dict = {}
 #dic2 = {('harry','voldemort'):1, ('coisa1','coisa2'):1,}
 # vai dividir livro por capitulos e usar a funçao interact em cada um.
-def procTexto(t, words):
+def procTexto(t):
     num_cap = 0
     text2 = sub(r'\f', '', txt)
     text3 = sub(r'\n\n+', '\n', text2)
@@ -98,13 +102,12 @@ def procTexto(t, words):
         cap_ent = []
         num_cap += 1
         for j in range(0,len(frases)):
-            name_entity = interact(frases[j], words)
-            if name_entity: # se a lista nao for vazia adiciona
+            name_entity = interact(frases[j])
+            if len(name_entity) >= 2: # se a lista nao for vazia adiciona
                 # len(name_entity) >= 2
                 cap_ent.append(name_entity)
         #print(cap_ent)
             #name_entity = sorted(set(name_entity))
-            
             # -------------------------------------------------------------
         get_capitulo(god_dict, num_cap, cap_ent)
             # dentro do dic_god[capitulo] adicionar dic de dic interaçoes
@@ -118,7 +121,7 @@ for ficheiro in args:
         txt = f.read()
     #processar o texto
     #load de palavras commum
-    procTexto(txt[0], txt[1])
+    procTexto(txt[0])
 
 
 #diferentes opçoes
