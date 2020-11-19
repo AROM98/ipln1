@@ -27,16 +27,16 @@ ops = dict(ops)
 if '-l' in ops:
     if(ops['-l']=='pt'):
         spa = pt
-        print('Linguagem definida: '+spa.meta['lang'])
-        print('A ler: '+args)
+        print('Linguagem definida: ',spa.meta['lang'])
+        print('A ler: ',args)
     elif(ops['-l']=='en'):
         spa = en
-        print('Linguagem definida: '+spa.meta['lang'])
-        print('A ler: '+args)
+        print('Linguagem definida: ',spa.meta['lang'])
+        print('A ler: ',args)
 else:
     print("Linguagem pré definida(EN)")
     print(spa.meta['lang'])
-    print('A ler: '+args)
+    print('A ler: ',args)
 
 
 if '-q' in ops:
