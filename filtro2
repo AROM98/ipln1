@@ -1,5 +1,5 @@
-#!/usr/bin/python3
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+#!/usr/bin/python3
 """
 filtro para leitura de varios ficheiro passados em linha de comando
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
@@ -13,7 +13,12 @@ from pickle import *
 import spacy
 import functools
 
-n = spacy.load("en_core_web_sm")
+en = spacy.load("en_core_web_sm")
+pt = spacy.load("pt_core_news_sm")
+quebraR = r'— CAPÍTULO'
+
+def quebra(texto):
+    return re.split(quebraR ,texto)
 
 def concat_key(ls):
     my_elems = sorted(set(ls))
@@ -57,7 +62,9 @@ def flatten(input_list):
 
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
 def interact(frase):
+    print('frase: ',frase)
     name_entity = [x for x in frase.ents if x.label_ in ['PERSON']]
+    print('entidades: ',name_entity)
     #print('b:',name_entity)
 
     #print('a:',name_entity)
@@ -76,34 +83,40 @@ def interact(frase):
 
 
 god_dict = {}
-#dic2 = {('harry','voldemort'):1, ('coisa1','coisa2'):1,}
 # vai dividir livro por capitulos e usar a funçao interact em cada um.
 def procTexto(t):
     num_cap = 0
-    text2 = sub(r'\f', '', txt)
-    text3 = sub(r'\n\n+', '\n', text2)
-    text4 = sub(r'(\n[A-Z])\n', r'\n\1', text3)
+    #text2 = sub(r'\f', '', txt)
+    #text3 = sub(r'\n\n+', '\n', text2)
+    #text4 = sub(r'(\n[A-Z])\n', r'\n\1', text3)
     # texto limpo
-    regex = r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)"
+    #regex = r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)"
     #capitulos = findall(r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)", text4)
-    matches = re.finditer(regex, text4, re.DOTALL)
+    
+    #matches = re.finditer(regex, text4, re.DOTALL)
+    capitulos = quebra(t)
 
-    for matchNum, match in enumerate(matches, start=1):
+    #for matchNum, match in enumerate(matches, start=1):
+    for cap in capitulos:
         print('.\n')
         #print('.....................................\n')
         #print(match.group(1)+'\n') # nº do capitulo
+        #print(cap)
         #print(match.group(2)+'\n') # nome do capitulo
         #print(match.group(3)+'\n') # texto do capitulo
         #print('.....................................\n')
 
-        text = n(match.group(3))
+        #text = pt(match.group(3))
+        text = pt(cap)
         text.vocab.vectors
         frases = list(text.sents)
         cap_ent = []
         num_cap += 1
         for j in range(0,len(frases)):
+            
             name_entity = interact(frases[j])
-            if len(name_entity) >= 2: # se a lista nao for vazia adiciona
+            #print('name_entity: ',name_entity)
+            if name_entity: # se a lista nao for vazia adiciona
                 # len(name_entity) >= 2
                 cap_ent.append(name_entity)
         #print(cap_ent)
@@ -120,8 +133,7 @@ for ficheiro in args:
     with open(ficheiro) as f :
         txt = f.read()
     #processar o texto
-    #load de palavras commum
-    procTexto(txt[0])
+    procTexto(txt)
 
 
 #diferentes opçoes
