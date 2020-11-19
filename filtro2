@@ -1,5 +1,5 @@
-#!/usr/bin/python3
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+#!/usr/bin/python3
 """
 filtro para leitura de varios ficheiro passados em linha de comando
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
@@ -48,9 +48,9 @@ def quebra(texto):
     return re.split(quebraR ,texto)
 
 def concat_key(ls):
-    my_elems = sorted(set(ls))
+    #my_elems = sorted(set(ls))
     #print("lista = ",my_elems)
-    return functools.reduce(lambda a,b: a + " " + b, my_elems)
+    return functools.reduce(lambda a,b: a + " " + b, ls)
 
 def add_encounter(cap_encounters, ls):
     key_enc = concat_key(ls) # key (string) que representa as entidades
@@ -87,13 +87,17 @@ def flatten(input_list):
     return flat_list
 
 
+def substitute(nome):
+    pass
+
+
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
 def interact(frase):
     #print('frase: ',frase)
     name_entity = [x for x in frase.ents if x.label_ in ['PER','PERSON']]
     #print('entidades: ',name_entity)
     #print('b:',name_entity)
-
+    
     #print('a:',name_entity)
     # convert all names to lowercase and remove 's in names
     name_entity = [str(x).replace("'s","") for x in name_entity]
@@ -106,7 +110,9 @@ def interact(frase):
     name_entity = flatten(name_entity)
     # remove name words that are less than 3 letters to raise recognition accuracy
     name_entity = [x for x in name_entity if len(x) >= 3]
-    return name_entity
+
+    my_elems = sorted(set(name_entity))
+    return my_elems
 
 god_dict = {}
 # vai dividir livro por capitulos e usar a funçao interact em cada um.
@@ -142,8 +148,9 @@ def procTexto(t):
 
             name_entity = interact(frases[j])
             #print('name_entity: ',name_entity)
-            if name_entity: # se a lista nao for vazia adiciona
-                # len(name_entity) >= 2
+
+            if len(name_entity) >= 2: # se a lista nao for vazia adiciona
+                    # len(name_entity) >= 2
                 cap_ent.append(name_entity)
         #print(cap_ent)
             #name_entity = sorted(set(name_entity))
