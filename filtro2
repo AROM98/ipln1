@@ -1,5 +1,5 @@
-#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 #!/usr/bin/python3
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 """
 filtro para leitura de varios ficheiro passados em linha de comando
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
@@ -15,7 +15,34 @@ import functools
 
 en = spacy.load("en_core_web_sm")
 pt = spacy.load("pt_core_news_sm")
-quebraR = r'— CAPÍTULO'
+
+spa = en
+
+quebraR = r'CHAPTER '
+#quebraR = r'— CAPÍTULO'
+
+ops,args = getopt(sys.argv[1:],"l:q: ")
+ops = dict(ops)
+
+if '-l' in ops:
+    if(ops['-l']=='pt'):
+        spa = pt
+        print('Linguagem definida: '+spa.meta['lang'])
+        print('A ler: '+args)
+    elif(ops['-l']=='en'):
+        spa = en
+        print('Linguagem definida: '+spa.meta['lang'])
+        print('A ler: '+args)
+else:
+    print("Linguagem pré definida(EN)")
+    print(spa.meta['lang'])
+    print('A ler: '+args)
+
+
+if '-q' in ops:
+    quebraR = ops['-q']
+
+
 
 def quebra(texto):
     return re.split(quebraR ,texto)
@@ -62,9 +89,9 @@ def flatten(input_list):
 
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
 def interact(frase):
-    print('frase: ',frase)
-    name_entity = [x for x in frase.ents if x.label_ in ['PERSON']]
-    print('entidades: ',name_entity)
+    #print('frase: ',frase)
+    name_entity = [x for x in frase.ents if x.label_ in ['PER','PERSON']]
+    #print('entidades: ',name_entity)
     #print('b:',name_entity)
 
     #print('a:',name_entity)
@@ -72,7 +99,7 @@ def interact(frase):
     name_entity = [str(x).replace("'s","") for x in name_entity]
 
     name_entity = [str(x) for x in name_entity if x[0].isupper()]
-    print(name_entity)
+    #print(name_entity)
     # split names into single words ('Harry Potter' -> ['Harry', 'Potter'])
     name_entity = [x.replace(' ','_') for x in name_entity]
     # flatten the name list
@@ -80,7 +107,6 @@ def interact(frase):
     # remove name words that are less than 3 letters to raise recognition accuracy
     name_entity = [x for x in name_entity if len(x) >= 3]
     return name_entity
-
 
 god_dict = {}
 # vai dividir livro por capitulos e usar a funçao interact em cada um.
@@ -92,7 +118,7 @@ def procTexto(t):
     # texto limpo
     #regex = r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)"
     #capitulos = findall(r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)", text4)
-    
+
     #matches = re.finditer(regex, text4, re.DOTALL)
     capitulos = quebra(t)
 
@@ -107,13 +133,13 @@ def procTexto(t):
         #print('.....................................\n')
 
         #text = pt(match.group(3))
-        text = pt(cap)
+        text = spa(cap)
         text.vocab.vectors
         frases = list(text.sents)
         cap_ent = []
         num_cap += 1
         for j in range(0,len(frases)):
-            
+
             name_entity = interact(frases[j])
             #print('name_entity: ',name_entity)
             if name_entity: # se a lista nao for vazia adiciona
@@ -127,8 +153,6 @@ def procTexto(t):
     pretty_print_caps(god_dict)
 
 
-ops,args = getopt(sys.argv[1:],"a:o:")
-ops = dict(ops)
 for ficheiro in args:
     with open(ficheiro) as f :
         txt = f.read()
