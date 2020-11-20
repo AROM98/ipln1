@@ -1,5 +1,5 @@
+#!python3
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
-#!/usr/bin/python3
 """
 filtro para leitura de varios ficheiro passados em linha de comando
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
