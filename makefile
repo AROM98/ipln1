@@ -1,5 +1,6 @@
 down:
 	curl -o entirel https://raw.githubusercontent.com/AROM98/ipln1/master/entirel
+	chmod 755 entirel
 
 bin:
 	sudo mv entirel /usr/local/bin/
