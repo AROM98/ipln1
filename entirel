@@ -1,5 +1,5 @@
 #!python3
-#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+#!/usr/local/bin
 """
 Programa para captar relações entre entidades por cada capitulo de um livro.
 ...
@@ -52,7 +52,7 @@ def quebra(texto):
     return re.split(quebraR ,texto)
 
 '''
-Função que da concat ao elementos de uma lista, de modo a formar uma chave que 
+Função que da concat ao elementos de uma lista, de modo a formar uma chave que
 irá ser usado num dicionario de um certo capitulo.
 '''
 def concat_key(ls):
@@ -153,7 +153,7 @@ def procTexto(t):
             name_entity = interact(frases[j])
             if len(name_entity) >= 2: # se a lista tiver mais do que 2 entidades adiciona.
                 cap_ent.append(name_entity)
-   
+
         get_capitulo(god_dict, num_cap, cap_ent)  # dentro do dic_god[capitulo] adicionar dic de dic interaçoes
         num_cap += 1
     pretty_print_caps(god_dict)
@@ -166,5 +166,3 @@ for ficheiro in args:
         txt = f.read()
     #processar o texto
     procTexto(txt)
-
-    
