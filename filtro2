@@ -1,15 +1,13 @@
 #!python3
 #!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 """
-filtro para leitura de varios ficheiro passados em linha de comando
-#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+Programa para captar relações entre entidades por cada capitulo de um livro.
 ...
 """
 import sys
 from getopt import getopt
 from re import *
 import re
-from pickle import *
 import spacy
 import functools
 
@@ -33,6 +31,10 @@ if '-l' in ops:
         spa = en
         print('Linguagem definida: ',spa.meta['lang'])
         print('A ler: ',args)
+    else:
+        print('Linguagem nao aceite. Disponivel apenas: \'-l pt\' ou \'-l en\'\n')
+        exit()
+
 else:
     print("Linguagem pré definida(EN)")
     print(spa.meta['lang'])
@@ -43,27 +45,47 @@ if '-q' in ops:
     quebraR = ops['-q']
 
 
-
+'''
+Função que da split do texto pela string quebraR
+'''
 def quebra(texto):
     return re.split(quebraR ,texto)
 
+'''
+Função que da concat ao elementos de uma lista, de modo a formar uma chave que 
+irá ser usado num dicionario de um certo capitulo.
+'''
 def concat_key(ls):
-    #my_elems = sorted(set(ls))
-    #print("lista = ",my_elems)
     return functools.reduce(lambda a,b: a + " " + b, ls)
 
+'''
+Função que recebe um dicionario e uma lista de entidades (apanhadas de uma frase).
+É usado a concat_key() para formar a chave que usamos para procurar no dicionario,
+Se exister devolve o valor e caso contrário devolve 0 (valor default),  a isto é acrescentado mais 1.
+finalmente é adicionado ao dicinonario o novo numero de ocorrencias.
+'''
 def add_encounter(cap_encounters, ls):
     key_enc = concat_key(ls) # key (string) que representa as entidades
     num_enc = cap_encounters.get(key_enc, 0) + 1 # procura no dic do capito se encontra a key, se nao da 0
     cap_encounters[key_enc] = num_enc # add no dic do cap.
 
+'''
+Função que recebe o dicionario global, o numero de um capitulo e uma lista de listas de entidades.
+Esta lista de listas representa todas as frases de um capitulo.
+É criado um dicionario vazio (capitulo) para inserir as chaves e as ocorrencias.
+(for) para cada frase num capitulo faz o add_enconter().
+finalmente insere o dicionario criado, usando como chave o nº do capitulo a que se refere.
+'''
 def get_capitulo(god_dict, num_cap, lista_de_ents):
     init_dict = {}
     for ents in lista_de_ents:
         add_encounter(init_dict, ents)
     god_dict[num_cap] = init_dict
 
-
+'''
+Função usada para percorer o dicionario principal e imprimir de forma legivel
+o resultado.
+'''
 def pretty_print_caps(god_dict):
     for cap_num, cap_dict in god_dict.items():
         if not (cap_num == 0):
@@ -88,78 +110,57 @@ def flatten(input_list):
     return flat_list
 
 
-def substitute(nome):
-    pass
-
-
 # vai chamar-se interact e sera a função que usa o spacy para encontrar ralaçoes entre as personagens.
+'''
+função que faz o tratamento das entidades captadas pelo spacy
+'''
 def interact(frase):
-    #print('frase: ',frase)
+    # seleciona apenas entidades com label de PERSON or PER
     name_entity = [x for x in frase.ents if x.label_ in ['PER','PERSON']]
-    #print('entidades: ',name_entity)
-    #print('b:',name_entity)
-    
-    #print('a:',name_entity)
-    # convert all names to lowercase and remove 's in names
+    # converte os nomes para minusculas e remove 's
     name_entity = [str(x).replace("'s","") for x in name_entity]
-
+    # seleciona apenas nomes que começam com letra minuscula
     name_entity = [str(x) for x in name_entity if x[0].isupper()]
-    #print(name_entity)
-    # split names into single words ('Harry Potter' -> ['Harry', 'Potter'])
+    # em nomes com espaço, este é substituido por _
     name_entity = [x.replace(' ','_') for x in name_entity]
     # flatten the name list
     name_entity = flatten(name_entity)
-    # remove name words that are less than 3 letters to raise recognition accuracy
+    # remove nomes com tamanho menor 3, para aumentar fiabilidade
     name_entity = [x for x in name_entity if len(x) >= 3]
-
+    # retira nomes repetidos e ordena-os por ordem alfabetica.
     my_elems = sorted(set(name_entity))
     return my_elems
 
 god_dict = {}
-# vai dividir livro por capitulos e usar a funçao interact em cada um.
-def procTexto(t):
-    num_cap = 0
-    #text2 = sub(r'\f', '', txt)
-    #text3 = sub(r'\n\n+', '\n', text2)
-    #text4 = sub(r'(\n[A-Z])\n', r'\n\1', text3)
-    # texto limpo
-    #regex = r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)"
-    #capitulos = findall(r"(CHAPTER\ \w+)\s+([A-Z\ \'\,\.\-]+)\s+(.*?|\n)(?=CHAPTER\s\w+|Text copyright)", text4)
 
-    #matches = re.finditer(regex, text4, re.DOTALL)
+
+'''
+função que vai dividir livro por capitulos e usar a funçao interact em cada um.
+'''
+def procTexto(t):
+    # vars
+    num_cap = 0
     capitulos = quebra(t)
 
-    #for matchNum, match in enumerate(matches, start=1):
     for cap in capitulos:
-        #print('.\n')
-        #print('.....................................\n')
-        #print(match.group(1)+'\n') # nº do capitulo
-        #print(cap)
-        #print(match.group(2)+'\n') # nome do capitulo
-        #print(match.group(3)+'\n') # texto do capitulo
-        #print('.....................................\n')
-
-        #text = pt(match.group(3))
+        # spacy
         text = spa(cap)
         text.vocab.vectors
         frases = list(text.sents)
-        cap_ent = []
+        cap_ent = [] #lista que guarda todas as frases de um capitulo
         for j in range(0,len(frases)):
 
             name_entity = interact(frases[j])
-            #print('name_entity: ',name_entity)
-
-            if len(name_entity) >= 2: # se a lista nao for vazia adiciona
-                    # len(name_entity) >= 2
+            if len(name_entity) >= 2: # se a lista tiver mais do que 2 entidades adiciona.
                 cap_ent.append(name_entity)
-        #print(cap_ent)
-            #name_entity = sorted(set(name_entity))
-            # -------------------------------------------------------------
+   
         get_capitulo(god_dict, num_cap, cap_ent)  # dentro do dic_god[capitulo] adicionar dic de dic interaçoes
         num_cap += 1
     pretty_print_caps(god_dict)
 
-
+'''
+usado para ler o livro
+'''
 for ficheiro in args:
     with open(ficheiro) as f :
         txt = f.read()
