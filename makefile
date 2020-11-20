@@ -2,7 +2,7 @@ down:
 	curl -o entirel https://raw.githubusercontent.com/AROM98/ipln1/master/entirel
 
 bin:
-	sudo cp entirel /usr/local/bin/
+	sudo mv entirel /usr/local/bin/
 
 install:
 	pip3 install -U spacy
