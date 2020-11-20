@@ -1,5 +1,5 @@
 down:
-	curl -o entirel https://raw.githubusercontent.com/AROM98/ipln1/master/filtro2\?token\=AIUO2LSKIZGYQMO22IJATSC7X7G4C
+	curl -o entirel https://raw.githubusercontent.com/AROM98/ipln1/master/entirel
 
 bin:
 	sudo cp entirel /usr/local/bin/
