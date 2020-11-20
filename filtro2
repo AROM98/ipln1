@@ -66,10 +66,11 @@ def get_capitulo(god_dict, num_cap, lista_de_ents):
 
 def pretty_print_caps(god_dict):
     for cap_num, cap_dict in god_dict.items():
-        print('FOR CHAPTER #' + str(cap_num))
-        tmp = sorted(god_dict[cap_num].items(), key=lambda x: x[1]) # ordena por nº de interaçoes
-        for ents, ents_encounters in tmp:
-            print('\t(' + ents + ') -> ' + str(ents_encounters))
+        if not (cap_num == 0):
+            print('FOR CHAPTER #' + str(cap_num))
+            tmp = sorted(god_dict[cap_num].items(), key=lambda x: x[1]) # ordena por nº de interaçoes
+            for ents, ents_encounters in tmp:
+                print('\t(' + ents + ') -> ' + str(ents_encounters))
 
 
 def flatten(input_list):
@@ -130,7 +131,7 @@ def procTexto(t):
 
     #for matchNum, match in enumerate(matches, start=1):
     for cap in capitulos:
-        print('.\n')
+        #print('.\n')
         #print('.....................................\n')
         #print(match.group(1)+'\n') # nº do capitulo
         #print(cap)
@@ -143,7 +144,6 @@ def procTexto(t):
         text.vocab.vectors
         frases = list(text.sents)
         cap_ent = []
-        num_cap += 1
         for j in range(0,len(frases)):
 
             name_entity = interact(frases[j])
@@ -155,8 +155,8 @@ def procTexto(t):
         #print(cap_ent)
             #name_entity = sorted(set(name_entity))
             # -------------------------------------------------------------
-        get_capitulo(god_dict, num_cap, cap_ent)
-            # dentro do dic_god[capitulo] adicionar dic de dic interaçoes
+        get_capitulo(god_dict, num_cap, cap_ent)  # dentro do dic_god[capitulo] adicionar dic de dic interaçoes
+        num_cap += 1
     pretty_print_caps(god_dict)
 
 
@@ -166,8 +166,4 @@ for ficheiro in args:
     #processar o texto
     procTexto(txt)
 
-
-#diferentes opçoes
-if '-a' in ops:
-    pass
-    #gTree(ops["-a"])
+    
