@@ -10,3 +10,6 @@ install:
 	python3 -m spacy download en_core_web_sm
 
 entirel-install: down bin install
+
+entirel-remove:
+	sudo rm /usr/local/bin/entirel
